@@ -631,7 +631,7 @@ handle_info({'EXIT', Pid, Reason}, State) ->
     	    	false -> 
     	    	    NewState = State;
     	    	true  -> 
-                    NewChild = list_to_tuple(['child' | [Pid|tuple_to_list(NewChildSpec)]]), 
+                    NewChild = list_to_tuple(['child' , Pid | tuple_to_list(NewChildSpec)]), 
                     NewChildren = lists:keyreplace(Pid, #child.pid, State#state.children, NewChild),
                     NewState = State#state{children = NewChildren}
             end        
