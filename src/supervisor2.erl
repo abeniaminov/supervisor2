@@ -621,19 +621,20 @@ handle_cast({try_again_restart,Name}, State) ->
 
 handle_info({'EXIT', Pid, Reason}, State) ->
     Mod = State#state.module,
+	  NewState =
     case lists:keyfind(Pid, #child.pid, State#state.children) of
     	false -> 
-    	    NewState = State;
+    	    State;
     	Child ->
           ChildSpec = list_to_tuple(tl(tl(tuple_to_list(Child)))),
     	    {ok , NewChildSpec} = Mod:before_restart(Pid, ChildSpec),
     	    case NewChildSpec /= ChildSpec of
     	    	false -> 
-    	    	    NewState = State;
+    	    	    State;
     	    	true  -> 
                     NewChild = list_to_tuple(['child' , Pid | tuple_to_list(NewChildSpec)]), 
                     NewChildren = lists:keyreplace(Pid, #child.pid, State#state.children, NewChild),
-                    NewState = State#state{children = NewChildren}
+                    State#state{children = NewChildren}
             end        
     end,	     
     case restart_child(Pid, Reason, NewState) of
